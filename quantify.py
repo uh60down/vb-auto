@@ -35,27 +35,28 @@ def close_ad_popup(page):
     log("No ad popup found to close (or already closed)")
 
 
-LOGIN_BUTTON_TEXT_RE = re.compile(r"로그인|login|log in", re.IGNORECASE)
-
-
-def login(page, email, password):
+def login(page, country_code, phone_number, password):
     page.goto(LOGIN_URL, wait_until="networkidle")
 
-    email_input = page.locator(
-        'input[type="email"], input[name="email"], input[name="username"], '
-        'input[name="userId"], input[type="text"]'
-    ).first
-    email_input.wait_for(state="visible", timeout=30_000)
-    email_input.fill(email)
+    phone_input = page.get_by_placeholder("Enter your phone number")
+    phone_input.wait_for(state="visible", timeout=30_000)
 
-    password_input = page.locator('input[type="password"]').first
+    code_dropdown = page.get_by_text(re.compile(r"^\+\d+$")).first
+    current_code = code_dropdown.inner_text().strip()
+    if current_code != country_code:
+        code_dropdown.click()
+        page.get_by_text(country_code, exact=True).click()
+
+    phone_input.fill(phone_number)
+
+    password_input = page.get_by_placeholder("Enter your password")
     password_input.fill(password)
 
-    submit_button = page.get_by_role("button", name=LOGIN_BUTTON_TEXT_RE).first
+    submit_button = page.locator("form button, form >> button").last
     try:
         submit_button.click(timeout=5_000)
     except Exception:
-        log("Login button not found by role/text, falling back to Enter key")
+        log("Submit button not found, falling back to Enter key")
         password_input.press("Enter")
 
     page.wait_for_url(re.compile(r".*/home"), timeout=30_000)
@@ -81,14 +82,15 @@ def wait_for_modal_to_close(page):
 
 
 def main():
-    email = os.environ["VB_EMAIL"]
+    country_code = os.environ["VB_ID_CODE"]
+    phone_number = os.environ["VB_ID_PHONENUMBER"]
     password = os.environ["VB_PASSWORD"]
 
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
 
-        login(page, email, password)
+        login(page, country_code, phone_number, password)
         close_ad_popup(page)
 
         page.goto(QUANTIFY_URL)

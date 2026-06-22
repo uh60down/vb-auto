@@ -23,6 +23,7 @@ jobs:
 
       - name: Run quantify script
         env:
-          VB_EMAIL: ${{ secrets.VB_EMAIL }}
+          VB_ID_CODE: ${{ secrets.VB_ID_CODE }}
+          VB_ID_PHONENUMBER: ${{ secrets.VB_ID_PHONENUMBER }}
           VB_PASSWORD: ${{ secrets.VB_PASSWORD }}
         run: python quantify.py
