@@ -28,10 +28,10 @@ jobs:
           VB_PASSWORD: ${{ secrets.VB_PASSWORD }}
         run: python quantify.py
 
-      - name: Upload login failure screenshot
+      - name: Upload debug screenshots
         if: failure()
         uses: actions/upload-artifact@v4
         with:
-          name: login-failure-screenshot
-          path: login_failure.png
+          name: login-debug-screenshots
+          path: "*.png"
           if-no-files-found: ignore

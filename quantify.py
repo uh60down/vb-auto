@@ -35,30 +35,63 @@ def close_ad_popup(page):
     log("No ad popup found to close (or already closed)")
 
 
+def debug_shot(page, name):
+    """Save a screenshot for post-mortem inspection via the workflow artifact."""
+    try:
+        page.screenshot(path=f"debug_{name}.png")
+        log(f"Saved debug screenshot debug_{name}.png")
+    except Exception as exc:
+        log(f"Could not save debug screenshot {name}: {exc}")
+
+
+def select_country_code(page, country_code):
+    """Open the country-code popup, search, and pick the matching entry.
+
+    The field defaults to "+--" (nothing selected) and must always be set.
+    The popup markup is:
+        div.popup-con > div.search-con > input.inp[placeholder="Search"]
+                      > div.list > div.item > div.txt  (e.g. "대한민국 (+82)")
+    """
+    search_digits = country_code.lstrip("+")
+
+    page.locator("div.set_area").click(timeout=5_000)
+    debug_shot(page, "1_popup_open")
+
+    search_box = page.get_by_placeholder("Search")
+    search_box.wait_for(state="visible", timeout=5_000)
+    search_box.fill(search_digits, timeout=5_000)
+    debug_shot(page, "2_searched")
+
+    # Scope to the popup's result list so we don't match stray ".item" nodes
+    # elsewhere on the page. Each result's text is like "대한민국 (+82)".
+    option = page.locator("div.list div.item").filter(has_text=country_code).first
+    option.wait_for(state="visible", timeout=5_000)
+    option.click(timeout=5_000)
+    debug_shot(page, "3_after_select")
+
+    # Verify the selection actually took effect; "+--" means it did not.
+    selected = page.locator("div.set_area").inner_text().strip()
+    log(f"Country code field now reads: {selected!r}")
+    if search_digits not in selected:
+        raise RuntimeError(
+            f"Country code selection failed: field shows {selected!r}, "
+            f"expected to contain {search_digits!r}"
+        )
+
+
 def login(page, country_code, phone_number, password):
     page.goto(LOGIN_URL, wait_until="networkidle")
 
     phone_input = page.get_by_placeholder("Enter your phone number")
     phone_input.wait_for(state="visible", timeout=30_000)
 
-    # The country code field has no default selection ("+--"), so it must
-    # always be picked explicitly. The displayed code splits "+" and the
-    # digits across separate nodes (div.set_area > "+" text node + span),
-    # so match on the container element rather than its text content.
-    page.locator("div.set_area").click(timeout=5_000)
-    # The search box matches on digits only, without the "+" prefix.
-    search_digits = country_code.lstrip("+")
-    page.get_by_placeholder("Search").fill(search_digits, timeout=5_000)
-    # Each result is "div.item > div.txt" with text like "대한민국 (+82)",
-    # not the bare code, so match by substring rather than exact text.
-    code_option = page.locator("div.item").filter(has_text=country_code).first
-    code_option.wait_for(state="visible", timeout=5_000)
-    code_option.click(timeout=5_000)
+    select_country_code(page, country_code)
 
     phone_input.fill(phone_number)
 
     password_input = page.get_by_placeholder("Enter your password")
     password_input.fill(password)
+    debug_shot(page, "4_filled")
 
     submit_button = page.locator("form button, form >> button").last
     try:
