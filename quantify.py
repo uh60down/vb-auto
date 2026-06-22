@@ -35,11 +35,29 @@ def close_ad_popup(page):
     log("No ad popup found to close (or already closed)")
 
 
+LOGIN_BUTTON_TEXT_RE = re.compile(r"로그인|login|log in", re.IGNORECASE)
+
+
 def login(page, email, password):
-    page.goto(LOGIN_URL)
-    page.fill('input[type="email"], input[name="email"], input[type="text"]', email)
-    page.fill('input[type="password"]', password)
-    page.click('button[type="submit"]')
+    page.goto(LOGIN_URL, wait_until="networkidle")
+
+    email_input = page.locator(
+        'input[type="email"], input[name="email"], input[name="username"], '
+        'input[name="userId"], input[type="text"]'
+    ).first
+    email_input.wait_for(state="visible", timeout=30_000)
+    email_input.fill(email)
+
+    password_input = page.locator('input[type="password"]').first
+    password_input.fill(password)
+
+    submit_button = page.get_by_role("button", name=LOGIN_BUTTON_TEXT_RE).first
+    try:
+        submit_button.click(timeout=5_000)
+    except Exception:
+        log("Login button not found by role/text, falling back to Enter key")
+        password_input.press("Enter")
+
     page.wait_for_url(re.compile(r".*/home"), timeout=30_000)
     log("Logged in successfully")
 
