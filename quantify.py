@@ -22,16 +22,23 @@ def log(msg):
 
 
 def close_ad_popup(page):
-    page.wait_for_timeout(6000)
-    for selector in CLOSE_SELECTORS:
-        try:
-            locator = page.locator(selector).first
-            if locator.is_visible(timeout=1000):
-                locator.click()
-                log(f"Closed ad popup via selector: {selector}")
-                return
-        except Exception:
-            continue
+    # The "Invitation Event" popup loads its image from S3, so it can appear a
+    # few seconds after /home settles. Poll for the close icon rather than
+    # taking a single snapshot after a fixed wait. Close icon (confirmed DOM):
+    # <i class="van-badge__wrapper van-icon van-icon-cross">, which sits outside
+    # the div.popup-con body.
+    deadline = time.time() + 15
+    while time.time() < deadline:
+        for selector in CLOSE_SELECTORS:
+            try:
+                locator = page.locator(selector).first
+                if locator.is_visible(timeout=500):
+                    locator.click()
+                    log(f"Closed ad popup via selector: {selector}")
+                    return
+            except Exception:
+                continue
+        page.wait_for_timeout(1000)
     log("No ad popup found to close (or already closed)")
 
 
