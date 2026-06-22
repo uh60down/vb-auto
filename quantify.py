@@ -49,7 +49,9 @@ def login(page, country_code, phone_number, password):
     # The dropdown's search box matches on digits only, without the "+" prefix.
     search_digits = country_code.lstrip("+")
     page.get_by_role("textbox").last.fill(search_digits, timeout=5_000)
-    page.get_by_text(country_code, exact=True).click(timeout=5_000)
+    code_option = page.get_by_text(country_code, exact=True)
+    code_option.wait_for(state="visible", timeout=5_000)
+    code_option.click(timeout=5_000)
 
     phone_input.fill(phone_number)
 
