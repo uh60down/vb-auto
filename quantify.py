@@ -10,9 +10,9 @@ LOGIN_URL = "https://vectorblast.vip/user/login"
 HOME_URL = "https://vectorblast.vip/home"
 QUANTIFY_URL = "https://vectorblast.vip/quantify"
 
-REMAINING_RE = re.compile(r"수량화\s*가능한\s*시간[\s\S]{0,30}?(\d+)\s*/\s*5")
-MODAL_TEXT_HINTS = ["양자화 시작 중", "실행 패널 프로세스"]
-CLOSE_SELECTORS = ['[class*="close"]', '[aria-label="close"]', '[aria-label="Close"]']
+REMAINING_LABEL_TEXT = "Today's Quantifiable Count"
+MODAL_TEXT_HINTS = ["VectorBlast Run Panel Process"]
+CLOSE_SELECTORS = ["i.van-icon-cross"]
 
 MODAL_WAIT_TIMEOUT_MS = 90_000
 
@@ -102,8 +102,26 @@ def login(page, country_code, phone_number, password):
 
 
 def read_remaining_count(page):
-    content = page.content()
-    match = REMAINING_RE.search(content)
+    """Read the "N/5" value from div.val, located via the div.name label.
+
+    Confirmed real DOM:
+        <div class="name">Today's Quantifiable Count</div>
+        <div class="val">5/5</div>
+    Label and value are separate sibling divs, not one contiguous string.
+    """
+    name_locator = page.locator("div.name", has_text=REMAINING_LABEL_TEXT).first
+    try:
+        name_locator.wait_for(state="visible", timeout=10_000)
+    except Exception:
+        return None
+
+    val_locator = name_locator.locator("xpath=following-sibling::div[contains(@class,'val')][1]")
+    try:
+        val_text = val_locator.inner_text(timeout=5_000).strip()
+    except Exception:
+        return None
+
+    match = re.match(r"(\d+)\s*/\s*\d+", val_text)
     if not match:
         return None
     return int(match.group(1))
