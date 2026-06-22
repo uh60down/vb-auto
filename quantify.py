@@ -46,10 +46,12 @@ def login(page, country_code, phone_number, password):
     # digits across separate nodes (div.set_area > "+" text node + span),
     # so match on the container element rather than its text content.
     page.locator("div.set_area").click(timeout=5_000)
-    # The dropdown's search box matches on digits only, without the "+" prefix.
+    # The search box matches on digits only, without the "+" prefix.
     search_digits = country_code.lstrip("+")
-    page.get_by_role("textbox").last.fill(search_digits, timeout=5_000)
-    code_option = page.get_by_text(country_code, exact=True)
+    page.get_by_placeholder("Search").fill(search_digits, timeout=5_000)
+    # Each result is "div.item > div.txt" with text like "대한민국 (+82)",
+    # not the bare code, so match by substring rather than exact text.
+    code_option = page.locator("div.item").filter(has_text=country_code).first
     code_option.wait_for(state="visible", timeout=5_000)
     code_option.click(timeout=5_000)
 
