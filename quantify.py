@@ -97,7 +97,14 @@ def main():
         browser = p.chromium.launch(headless=True)
         page = browser.new_page()
 
-        login(page, country_code, phone_number, password)
+        try:
+            login(page, country_code, phone_number, password)
+        except Exception:
+            page.screenshot(path="login_failure.png")
+            log("Login failed, saved screenshot to login_failure.png")
+            browser.close()
+            raise
+
         close_ad_popup(page)
 
         page.goto(QUANTIFY_URL)

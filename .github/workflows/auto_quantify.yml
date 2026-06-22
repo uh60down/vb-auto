@@ -27,3 +27,11 @@ jobs:
           VB_ID_PHONENUMBER: ${{ secrets.VB_ID_PHONENUMBER }}
           VB_PASSWORD: ${{ secrets.VB_PASSWORD }}
         run: python quantify.py
+
+      - name: Upload login failure screenshot
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: login-failure-screenshot
+          path: login_failure.png
+          if-no-files-found: ignore
