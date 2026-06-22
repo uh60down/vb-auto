@@ -93,12 +93,9 @@ def login(page, country_code, phone_number, password):
     password_input.fill(password)
     debug_shot(page, "4_filled")
 
-    submit_button = page.locator("form button, form >> button").last
-    try:
-        submit_button.click(timeout=5_000)
-    except Exception:
-        log("Submit button not found, falling back to Enter key")
-        password_input.press("Enter")
+    # The submit control is a div, not a <button>: <div class="submit-btn on">
+    # wrapping an arrow <img>. Click it directly.
+    page.locator("div.submit-btn").click(timeout=5_000)
 
     page.wait_for_url(re.compile(r".*/home"), timeout=30_000)
     log("Logged in successfully")
