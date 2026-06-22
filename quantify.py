@@ -41,11 +41,16 @@ def login(page, country_code, phone_number, password):
     phone_input = page.get_by_placeholder("Enter your phone number")
     phone_input.wait_for(state="visible", timeout=30_000)
 
-    code_dropdown = page.get_by_text(re.compile(r"^\+\d+$")).first
-    current_code = code_dropdown.inner_text().strip()
-    if current_code != country_code:
-        code_dropdown.click()
-        page.get_by_text(country_code, exact=True).click()
+    if country_code != "+82":
+        try:
+            code_dropdown = page.get_by_text(re.compile(r"^\+\d+$")).first
+            code_dropdown.click(timeout=5_000)
+            # The dropdown's search box matches on digits only, without the "+" prefix.
+            search_digits = country_code.lstrip("+")
+            page.get_by_role("textbox").last.fill(search_digits, timeout=5_000)
+            page.get_by_text(country_code, exact=True).click(timeout=5_000)
+        except Exception:
+            log(f"Could not change country code dropdown to {country_code}, leaving default")
 
     phone_input.fill(phone_number)
 
