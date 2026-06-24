@@ -1,2 +1,2 @@
 # vb-auto
-vector blaster automation
+vb automation
