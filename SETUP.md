@@ -106,9 +106,15 @@ You don't need to do anything else. GitHub will automatically run the bot
 **several times every hour** (at :07, :17, :27 and :47) and stop once your daily
 quantify limit is used up. Your phone/PC can be off — it all runs on GitHub's servers.
 
-> Note: GitHub sometimes skips a scheduled time when its servers are busy.
-> That's normal and harmless — the bot runs again at the next slot, and your
-> daily limit still gets used up. You don't need to do anything.
+> **Important — about GitHub's schedule:** GitHub's free scheduler is
+> "best effort", not a guarantee. When GitHub's servers are busy, a scheduled
+> time can be **delayed by several minutes, or skipped entirely**. This is normal
+> GitHub behavior and there is nothing wrong with your setup.
+>
+> That's exactly why the bot is scheduled **several times per hour** (:07, :17,
+> :27, :47) instead of once: even if some slots get skipped, a later slot still
+> runs and your daily quantify limit still gets used up. You don't need to do
+> anything — just let it run.
 
 ---
 
@@ -126,8 +132,14 @@ Click the failed run, then click the **quantify** job to read the log.
 - After fixing a secret, just run the test again (Step 5).
 
 **I don't see scheduled runs appearing on their own.**
-A brand-new fork can take an hour or two before the automatic schedule starts.
-Give it some time. The manual test (Step 5) works immediately regardless.
+Two reasons, both normal:
+1. A brand-new fork can take an hour or two before the automatic schedule starts.
+   Give it some time.
+2. GitHub's free scheduler skips runs when its servers are busy, so an individual
+   slot (e.g. :17) may not fire. Wait for the next slot — it usually catches up.
+
+The manual test (Step 5) always works immediately regardless, so use that if you
+ever want to force a run right now.
 
 **I want to stop the bot.**
 Go to **Actions** → **Auto Quantify** → the **•••** menu → **Disable workflow**.
