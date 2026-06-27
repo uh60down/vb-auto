@@ -1,8 +1,8 @@
-# VectorBlast Auto-Quantify — Setup Guide
+# Auto-Quantify — Setup Guide
 
-This guide lets you run the VectorBlast auto-quantify bot on **your own** GitHub
+This guide lets you run the auto-quantify bot on **your own** GitHub
 account, for free, with **no computer required**. Once set up, GitHub's servers
-will log into VectorBlast and click the "quantify" button for you automatically,
+will log into the service and click the "quantify" button for you automatically,
 several times a day.
 
 You do **not** need to know how to code. Just follow each step in order.
@@ -12,7 +12,7 @@ The whole thing takes about **10 minutes**.
 
 ## What you need
 
-- A phone number + password for your **VectorBlast** account (the one you log in with).
+- A phone number + password for your account (the one you log in with).
 - About 10 minutes.
 
 ---
@@ -53,7 +53,7 @@ Done. Automation is now allowed.
 
 ---
 
-## Step 4 — Add your VectorBlast login (Secrets)
+## Step 4 — Add your login (Secrets)
 
 These are stored **encrypted** and are only used by the bot to log in. Nobody,
 including the project owner, can read them.
@@ -75,7 +75,7 @@ including the project owner, can read them.
 5. Click **New repository secret** one more time and add the **third** secret:
 
    - **Name:** `VB_PASSWORD`
-   - **Secret:** your VectorBlast password
+   - **Secret:** your account password
    - Click **Add secret**.
 
 > ⚠️ The three names must be **exactly** as written above (all capital letters,
@@ -152,6 +152,6 @@ Go to **Actions** → **Auto Quantify** → the **•••** menu → **Disable
 |----------------------|--------------------------------------|---------------|
 | `VB_ID_CODE`         | Country code **with** `+`            | `+82`         |
 | `VB_ID_PHONENUMBER`  | Phone number **without** country code| `1012345678`  |
-| `VB_PASSWORD`        | Your VectorBlast password            | `••••••••`    |
+| `VB_PASSWORD`        | Your account password                | `••••••••`    |
 
 Runs automatically at **:07, :17, :27 and :47 every hour**. Nothing else to do. ✅
