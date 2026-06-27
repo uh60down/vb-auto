@@ -103,8 +103,8 @@ Let's make sure it works before leaving it on autopilot.
 ## Step 6 — That's it — it now runs automatically
 
 You don't need to do anything else. GitHub will automatically run the bot
-**twice every hour** (at :17 and :47) and stop once your daily quantify limit
-is used up. Your phone/PC can be off — it all runs on GitHub's servers.
+**several times every hour** (at :07, :17, :27 and :47) and stop once your daily
+quantify limit is used up. Your phone/PC can be off — it all runs on GitHub's servers.
 
 > Note: GitHub sometimes skips a scheduled time when its servers are busy.
 > That's normal and harmless — the bot runs again at the next slot, and your
@@ -142,4 +142,4 @@ Go to **Actions** → **Auto Quantify** → the **•••** menu → **Disable
 | `VB_ID_PHONENUMBER`  | Phone number **without** country code| `1012345678`  |
 | `VB_PASSWORD`        | Your VectorBlast password            | `••••••••`    |
 
-Runs automatically at **:17 and :47 every hour**. Nothing else to do. ✅
+Runs automatically at **:07, :17, :27 and :47 every hour**. Nothing else to do. ✅
